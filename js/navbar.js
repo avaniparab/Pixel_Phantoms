@@ -9,7 +9,7 @@ function renderNavbar(basePath = '') {
             <li><a href="${basePath}index.html">Home</a></li>
             <li><a href="${basePath}about.html">About</a></li>
              <li><a href="${basePath}events.html">Events</a></li>
-            <li><a href="${basePath}pages/contributors.html">Contributors</a></li> 
+            <li><a href="${basePath}pages/contributors.html">Team</a></li> 
             <li><a href="${basePath}contact.html">Contact</a></li>
             <li>
                 <div class="theme-toggle">
