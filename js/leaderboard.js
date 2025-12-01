@@ -11,9 +11,9 @@ const EVENT_DATA_URL = '../data/attendance.csv'; // Path to your CSV
 // --- SCORING MATRIX (Inspired by Contributors.js) ---
 const SCORING = {
     PR: {
-        L3: 1100,    // High Complexity
-        L2: 500,    // Medium Complexity
-        L1: 200,    // Low Complexity
+        L3: 500,    // High Complexity
+        L2: 300,    // Medium Complexity
+        L1: 100,    // Low Complexity
         DEFAULT: 50
     },
     EVENT: {
@@ -27,6 +27,10 @@ let globalState = {
     contributors: [],
     pullRequests: [],
     attendance: {}, // Map<username, count>
+    eventStats: {
+        totalEvents: 0,
+        totalAttendance: 0
+    },
     physics: {
         totalMass: 0,
         avgVelocity: 0
@@ -54,14 +58,16 @@ async function initDashboard() {
         ]);
 
         // Process CSV
-        globalState.attendance = parseAttendanceCSV(csvText);
+        const attendanceData = parseAttendanceCSV(csvText);
+        globalState.attendance = attendanceData.map;
+        globalState.eventStats = attendanceData.stats;
         
         // Process & Merge Data
         globalState.pullRequests = prData;
         const leaderboard = calculateLeaderboard(prData, globalState.attendance);
         
         // Render UI
-        updateGlobalHUD(leaderboard, repoData);
+        updateGlobalHUD(leaderboard, globalState.eventStats);
         renderLeaderboardTable(leaderboard);
         renderPhysicsEngine(leaderboard);
         renderVisualizers(leaderboard);
@@ -99,20 +105,38 @@ async function fetchEventCSV() {
 
 function parseAttendanceCSV(csvText) {
     const attendanceMap = {};
-    if (!csvText) return attendanceMap;
+    const uniqueEvents = new Set();
+    let totalAttendance = 0;
 
-    // Assumes CSV Format: GitHubUsername, EventDate, EventName
+    if (!csvText) return { map: attendanceMap, stats: { totalEvents: 0, totalAttendance: 0 } };
+
+    // Assumes CSV Format: GitHubUsername,Date,EventName
     const lines = csvText.split('\n');
+    
     lines.slice(1).forEach(line => { // Skip header
         const parts = line.split(',');
-        if (parts.length >= 1) {
+        if (parts.length >= 3) {
             const username = parts[0].trim();
-            if (username) {
+            const eventName = parts[2].trim();
+            
+            if (username && eventName) {
+                // Update User Attendance Count
                 attendanceMap[username] = (attendanceMap[username] || 0) + 1;
+                
+                // Global Stats
+                uniqueEvents.add(eventName);
+                totalAttendance++;
             }
         }
     });
-    return attendanceMap;
+
+    return {
+        map: attendanceMap,
+        stats: {
+            totalEvents: uniqueEvents.size,
+            totalAttendance: totalAttendance
+        }
+    };
 }
 
 /* =========================================
@@ -152,12 +176,12 @@ function calculateLeaderboard(pulls, attendanceMap) {
         }
     });
 
-    // 2. Process Events (Bonus XP)
+    // 2. Process Events (Bonus XP for Attendance)
     Object.keys(attendanceMap).forEach(user => {
         if (!userMap[user]) {
             // User attended event but hasn't coded yet (Potential Recruit)
-            // We need an avatar, so we use a default or try to fetch
-            initUser(userMap, user, `https://github.com/${user}.png`);
+            // We need an avatar, so we use a default based on username
+            initUser(userMap, user, `https://avatars.githubusercontent.com/${user}`);
         }
         
         const eventsAttended = attendanceMap[user];
@@ -176,8 +200,8 @@ function calculateLeaderboard(pulls, attendanceMap) {
         agent.rank = index + 1;
         
         // Determine Class based on Mass (Complexity handled)
-        if (agent.mass > 20) agent.class = 'TITAN';
-        else if (agent.mass > 10) agent.class = 'STRIKER';
+        if (agent.mass > 20 || agent.events > 10) agent.class = 'TITAN';
+        else if (agent.mass > 10 || agent.events > 5) agent.class = 'STRIKER';
         else agent.class = 'SCOUT';
 
         // Determine Status based on Velocity
@@ -204,24 +228,25 @@ function initUser(map, login, avatar) {
 /* =========================================
    3. RENDERING & UI
    ========================================= */
-function updateGlobalHUD(data, repo) {
-    const totalXP = data.reduce((sum, u) => sum + u.xp, 0);
-    const totalPRs = data.reduce((sum, u) => sum + u.prCount, 0);
-    
-    animateCount('total-contributors', data.length);
-    animateCount('total-prs', totalPRs);
-    animateCount('total-stars', repo.stargazers_count || 0); // Using Stars as "Star Power"
+function updateGlobalHUD(data, eventStats) {
+    animateCount('total-performers', data.length);
+    animateCount('total-events', eventStats.totalEvents);
+    animateCount('total-attendance', eventStats.totalAttendance);
     
     // Update Sidebar Ping (Just for effect)
     setInterval(() => {
         const ping = Math.floor(Math.random() * 20) + 10;
-        document.getElementById('ping-counter').innerText = `${ping}ms`;
-        document.getElementById('ping-counter').style.color = ping > 25 ? '#ff0055' : '#0aff60';
+        const pingEl = document.getElementById('ping-counter');
+        if(pingEl) {
+            pingEl.innerText = `${ping}ms`;
+            pingEl.style.color = ping > 25 ? '#ff0055' : '#0aff60';
+        }
     }, 2000);
 }
 
 function renderLeaderboardTable(data) {
     const tbody = document.getElementById('leaderboard-body');
+    if(!tbody) return;
     tbody.innerHTML = '';
 
     data.slice(0, 50).forEach(agent => {
@@ -277,6 +302,7 @@ function renderPhysicsEngine(data) {
 
 function renderVisualizers(data) {
     const container = document.getElementById('chart-bars');
+    if(!container) return;
     container.innerHTML = '';
     
     // Create a visualizer based on the top 20 agents' XP
@@ -354,7 +380,7 @@ function loadMockProtocol() {
         { login: "Morpheus_Dev", avatar_url: "", xp: 9800, velocity: 40, mass: 55, prCount: 20, events: 1, rank: 3, class: "TITAN", status: "ONLINE" },
         { login: "Cipher_Ops", avatar_url: "", xp: 5000, velocity: 10, mass: 12, prCount: 5, events: 8, rank: 4, class: "SCOUT", status: "IDLE" },
     ];
-    updateGlobalHUD(mockData, { stargazers_count: 404 });
+    updateGlobalHUD(mockData, { totalEvents: 12, totalAttendance: 450 });
     renderLeaderboardTable(mockData);
     renderPhysicsEngine(mockData);
     renderVisualizers(mockData);

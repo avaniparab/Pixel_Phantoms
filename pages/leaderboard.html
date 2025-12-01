@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/home-gsap.css">
     <link rel="stylesheet" href="../css/back-to-top.css">
+    
     <link rel="stylesheet" href="../css/leaderboard.css">
     
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -30,13 +31,13 @@
             
             <header class="hud-top-bar">
                 <div class="header-title">
-                    <h1 class="glitch-text" data-text="LEADERBOARD_MATRIX">LEADERBOARD_MATRIX</h1>
-                    <span class="sub-text">:: SYSTEM_OVERRIDE // PHYSICS_ENGINE_ACTIVE ::</span>
+                    <h1 class="glitch-text" data-text="PERFORMANCE_MATRIX">PERFORMANCE_MATRIX</h1>
+                    <span class="sub-text">:: SYSTEM_OVERRIDE // EVENT_PROTOCOL_V2 ::</span>
                 </div>
                 <div class="header-stats">
                     <div class="stat-pill">
                         <span class="label">PING</span>
-                        <span class="val green" id="ping-counter">--ms</span>
+                        <span class="val green" id="ping-counter">12ms</span>
                     </div>
                     <div class="stat-pill">
                         <span class="label">DATA_STREAM</span>
@@ -71,50 +72,50 @@
                     <div class="physics-grid">
                         <div class="physics-stat">
                             <h4><i class="fas fa-tachometer-alt"></i> Velocity (V)</h4>
-                            <p>Commit Frequency / 30 Days</p>
-                            <div class="bar-container"><div class="bar-fill" style="width: 0%"></div></div>
+                            <p>Commit Frequency / Time</p>
+                            <div class="bar-container"><div class="bar-fill" style="width: 85%"></div></div>
                         </div>
                         <div class="physics-stat">
                             <h4><i class="fas fa-weight-hanging"></i> Mass (M)</h4>
-                            <p>PR Complexity (Labels)</p>
-                            <div class="bar-container"><div class="bar-fill" style="width: 0%"></div></div>
+                            <p>Lines of Code + Complexity</p>
+                            <div class="bar-container"><div class="bar-fill" style="width: 60%"></div></div>
                         </div>
                         <div class="physics-stat">
                             <h4><i class="fas fa-meteor"></i> Impact (F)</h4>
-                            <p>Total XP (F = M x V + Events)</p>
-                            <div class="bar-container"><div class="bar-fill" style="width: 0%"></div></div>
+                            <p>F = M x A + Event Bonus</p>
+                            <div class="bar-container"><div class="bar-fill" style="width: 92%"></div></div>
                         </div>
                     </div>
                     <div class="physics-note">
-                        > The algorithm treats code as matter. <strong>Higher Complexity PRs</strong> add Mass. <strong>Frequent merges</strong> increase Velocity. <strong>Event Attendance</strong> provides a raw Momentum boost (+200 XP).
+                        > The algorithm treats contributions as matter. <strong>Events</strong> provide a raw Momentum boost (+200 XP). <strong>Participation</strong> (hosting/attending) is key to maintaining high Impact.
                     </div>
                 </div>
 
                 <div class="bento-item stat-tile s1">
                     <div class="tile-icon"><i class="fas fa-user-astronaut"></i></div>
                     <div class="tile-info">
-                        <h3>Active Agents</h3>
-                        <h2 id="total-contributors">0</h2>
+                        <h3>Active Performers</h3>
+                        <h2 id="total-performers">0</h2>
                     </div>
                 </div>
                 <div class="bento-item stat-tile s2">
-                    <div class="tile-icon"><i class="fas fa-code-branch"></i></div>
+                    <div class="tile-icon"><i class="fas fa-calendar-check"></i></div>
                     <div class="tile-info">
-                        <h3>Merge Requests</h3>
-                        <h2 id="total-prs">0</h2>
+                        <h3>Events Held</h3>
+                        <h2 id="total-events">0</h2>
                     </div>
                 </div>
                 <div class="bento-item stat-tile s3">
-                    <div class="tile-icon"><i class="fas fa-star"></i></div>
+                    <div class="tile-icon"><i class="fas fa-users"></i></div>
                     <div class="tile-info">
-                        <h3>Star Power</h3>
-                        <h2 id="total-stars">0</h2>
+                        <h3>Total Attendance</h3>
+                        <h2 id="total-attendance">0</h2>
                     </div>
                 </div>
 
                 <div class="bento-item table-panel">
                     <div class="panel-header">
-                        <span><i class="fas fa-list-ol"></i> TOP_CONTRIBUTORS</span>
+                        <span><i class="fas fa-list-ol"></i> TOP_PERFORMERS</span>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" id="search-input" placeholder="Search Agent ID...">
@@ -126,20 +127,22 @@
                                 <tr>
                                     <th>RANK</th>
                                     <th>OPERATOR</th>
-                                    <th>CLASS</th>
+                                    <th>LEAGUE</th>
                                     <th>VELOCITY</th>
                                     <th>XP</th>
                                     <th>STATUS</th>
                                 </tr>
                             </thead>
-                            <tbody id="leaderboard-body"></tbody>
+                            <tbody id="leaderboard-body">
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="bento-item graph-panel">
                     <div class="panel-label">ACTIVITY_WAVEFORM</div>
-                    <div class="chart-bars" id="chart-bars"></div>
+                    <div class="chart-bars" id="chart-bars">
+                        </div>
                 </div>
 
             </div>
@@ -153,6 +156,7 @@
     <script src="../js/theme.js"></script>
     <script src="../js/back-to-top.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
     <script src="../js/leaderboard.js"></script>
 
     <script>
